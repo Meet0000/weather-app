@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy Node.js app to Azure Web App - WeatherCollabApp
 
 on:
@@ -18,13 +21,11 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build (optional), and test (optional)
+      - name: npm install, build, and test
         run: |
           npm install
-          # Uncomment if you have a build script
-          # npm run build --if-present
-          # Uncomment if you want to run tests
-          # npm run test --if-present
+          npm run build --if-present
+         
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
@@ -40,6 +41,9 @@ jobs:
     needs: build
     environment:
       name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
@@ -49,13 +53,13 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_218AB50B56834D1C96EC046CF2F121D3 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7A3648FDE703480789A935515A80570D }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FC25A325C3324C2A9A002B0FE755AC8B }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -64,6 +68,3 @@ jobs:
           app-name: 'WeatherCollabApp'
           slot-name: 'Production'
           package: .
-
-      - name: Display Web App URL
-        run: echo "Your app is live at https://WeatherCollabApp.azurewebsites.net"
